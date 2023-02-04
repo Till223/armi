@@ -28,6 +28,10 @@ from armi.nucDirectory import nucDir
 from armi.nucDirectory import nuclideBases
 from armi.utils import densityTools
 from armi.utils.customExceptions import InputError
+from armi.physics.neutronics.fissionProductModel.fissionProductModelSettings import (
+    CONF_FP_MODEL,
+    CONF_FISSION_PRODUCT_LIBRARY_NAME,
+)
 
 ALLOWED_KEYS = set(nuclideBases.byName.keys()) | set(elements.bySymbol.keys())
 
@@ -578,7 +582,7 @@ def autoUpdateNuclideFlags(cs, nuclideFlags):
     if nbs:
         runLog.info(
             f"Adding explicit fission products to the nuclide flags based on the "
-            f"fission product model set to `{cs['fpModel']}`."
+            f"fission product model set to `{cs[CONF_FP_MODEL]}`."
         )
         for nb in nbs:
             nuc = nb.name
@@ -591,18 +595,18 @@ def autoUpdateNuclideFlags(cs, nuclideFlags):
 def getAllNuclideBasesByLibrary(cs):
     """
     Return a list of nuclide bases available for cross section modeling
-    based on the ``fpModelLibrary`` setting.
+    based on the ``CONF_FISSION_PRODUCT_LIBRARY_NAME`` setting.
     """
     nbs = []
-    if cs["fpModel"] == "explicitFissionProducts":
-        if not cs["fpModelLibrary"]:
+    if cs[CONF_FP_MODEL] == "explicitFissionProducts":
+        if not cs[CONF_FISSION_PRODUCT_LIBRARY_NAME]:
             nbs = []
-        if cs["fpModelLibrary"] == "MC2-3":
+        if cs[CONF_FISSION_PRODUCT_LIBRARY_NAME] == "MC2-3":
             nbs = nuclideBases.byMcc3Id.values()
         else:
             raise ValueError(
-                f"An option to handle the `fpModelLibrary` "
-                f"set to `{cs['fpModelLibrary']}` has not been "
+                f"An option to handle the `CONF_FISSION_PRODUCT_LIBRARY_NAME` "
+                f"set to `{cs[CONF_FISSION_PRODUCT_LIBRARY_NAME]}` has not been "
                 f"implemented."
             )
     return nbs
